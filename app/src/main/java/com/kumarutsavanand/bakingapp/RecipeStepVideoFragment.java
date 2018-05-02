@@ -53,6 +53,7 @@ public class RecipeStepVideoFragment extends Fragment {
     private int currentWindow;
     private boolean playWhenReady = true;
     private static String PLAYBACK_POSITION = "PLAYBACK_POSITION";
+    private static String PLAYBACKSTATE = "PLAYBACKSTATE";
 
     public RecipeStepVideoFragment() {
         // Empty Constructor
@@ -85,6 +86,7 @@ public class RecipeStepVideoFragment extends Fragment {
             mStepIndex = savedInstanceState.getInt(RecipeDetailActivity.SELECTED_STEP_INDEX);
             mRecipeName = savedInstanceState.getString(RecipeDetailActivity.SELECTED_RECIPE_NAME);
             playBackPosition = savedInstanceState.getLong(PLAYBACK_POSITION);
+            playWhenReady = savedInstanceState.getBoolean(PLAYBACKSTATE);
 
 
         }
@@ -147,6 +149,7 @@ public class RecipeStepVideoFragment extends Fragment {
         if(!videoUrl.isEmpty()) {
             mPlayerView.setVisibility(View.VISIBLE);
             initializePlayer();
+
             if (rootView.findViewWithTag("sw600dp") != null) {
                 getActivity().findViewById(R.id.video_container)
                         .setLayoutParams(new LinearLayout.LayoutParams(-1,-2));
@@ -177,8 +180,7 @@ public class RecipeStepVideoFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         if(mPlayer != null) {
-            mPlayer.stop();
-            mPlayer.release();
+            releasePlayer();
         }
     }
 
@@ -202,8 +204,8 @@ public class RecipeStepVideoFragment extends Fragment {
     public void onStop() {
         super.onStop();
         if(mPlayer != null) {
-            mPlayer.stop();
-            mPlayer.release();        }
+            releasePlayer();
+        }
     }
 
     private void initializePlayer() {
@@ -214,6 +216,7 @@ public class RecipeStepVideoFragment extends Fragment {
             mPlayer.setPlayWhenReady(playWhenReady);
             mPlayer.seekTo(currentWindow, playBackPosition);
         }
+
         MediaSource mediaSource = buildMediaSource(Uri.parse(videoUrl));
         mPlayer.prepare(mediaSource, true, false);
     }
@@ -240,6 +243,7 @@ public class RecipeStepVideoFragment extends Fragment {
         outState.putInt(RecipeDetailActivity.SELECTED_STEP_INDEX, mStepIndex);
         outState.putString(RecipeDetailActivity.SELECTED_RECIPE_NAME, mRecipeName);
         outState.putLong(PLAYBACK_POSITION, playBackPosition);
+        outState.putBoolean(PLAYBACKSTATE, playWhenReady);
     }
 
 
